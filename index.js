@@ -8,18 +8,18 @@ const Store = require('./store.js');
     Declare > Window
 */
 
-let appIconLoc = app.getAppPath() + '/ntfy.png';
+let appIconLoc = app.getAppPath() + '/icon.png';
 let winMain, tray;
 
 /*
     Declare > CLI State
 
     bWinHidden      --hidden    app closes to tray on start
-    bDevTools       --dev       dev tools added to menu
     bQuitOnClose    --quit      when pressing top-right close button, app exits instead of going to tray
 */
 
 let bWinHidden = 0;
+let bDevTools = 0;
 let bQuitOnClose = 0;
 
 /*
@@ -38,6 +38,7 @@ const store = new Store({
     configName: 'prefs',
     defaults: {
         instanceURL: 'https://google.com',
+        bDevTools: 0,
         bQuitOnClose: 0
     }
 });
@@ -99,17 +100,28 @@ const menu_Main = [
                             multiInputOptions:
                                 [
                                     {
-                                        label: 'Test',
+                                        label: 'Enable dev tools',
                                         selectOptions: { 0: 'Disabled', 1: 'Enabled' },
 					                    value: store.get('bDevTools'),
+                                    },
+                                    {
+                                        label: 'Quit on Close',
+                                        selectOptions: { 0: 'Disabled', 1: 'Enabled' },
+					                    value: store.get('bQuitOnClose')
                                     }
-                                ],
+                                ]
                         },
                         winMain
                     )
                     .then((response) => {
                         if (response !== null) {
+                            if ( store.get('bDevTools') !== response[0])
+                            {
+                                store.set('bDevTools', response[0])
+                                activeDevTools()
+                            }
 
+                            store.set('bQuitOnClose', response[1])
                         }
                     })
                     .catch((response) => {
@@ -126,6 +138,38 @@ const menu_Main = [
 
 const header_menu = Menu.buildFromTemplate(menu_Main);
 Menu.setApplicationMenu(header_menu);
+
+/*
+    Main Menu > Developer Tools
+    slides in top position of 'App' menu
+
+    when user disables dev console, must re-build menu, otherwise dev tools will stick
+
+    App | Configure | Help
+*/
+
+function activeDevTools() {
+    const header_menu = Menu.buildFromTemplate(menu_Main);
+    Menu.setApplicationMenu(header_menu);
+
+    if (bDevTools == 1 || store.get('bDevTools') == 1) {
+        let menuItem = header_menu.getMenuItemById('app')
+
+        menuItem.submenu.insert(0, new MenuItem(
+        {
+            label: 'Toggle Dev Tools',
+            accelerator: process.platform === 'darwin' ? 'ALT+CMD+I' : 'CTRL+SHIFT+I',
+            click: () => {
+                winMain.webContents.toggleDevTools();
+            }
+        },
+        {
+            type: 'separator'
+        },
+        ))
+    }
+}
+
 
 /*
     App > Ready
@@ -253,6 +297,9 @@ function ready() {
         if (process.argv[i] === '--hidden') {
             bWinHidden = 1;
             winMain.hide();
+        } else if (process.argv[i] === '--dev') {
+            bDevTools = 1;
+            activeDevTools()
         }
     }
 
