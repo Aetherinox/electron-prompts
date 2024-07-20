@@ -13,6 +13,11 @@ Electron EXCEPTION_ACCESS_VIOLATION crash on BrowserWindow.destroy()
 
 <br />
 
+## References
+- https://github.com/electron/electron/issues/42975
+
+<br />
+
 ---
 
 <br />
@@ -38,10 +43,3 @@ Electron EXCEPTION_ACCESS_VIOLATION crash on BrowserWindow.destroy()
 </div>
 
 <br />
-
----
-
-<br />
-
-# References:
-- https://github.com/electron/electron/issues/42975
