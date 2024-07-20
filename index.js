@@ -1,3 +1,11 @@
+/*
+    Project replicates a bug between Electron v31 and custom-electron-prompt v1.5.7
+    Attempting to close a dialog box using the close button in the top-right will
+    cause the elctron app to crash.
+
+    application hands in system background
+*/
+
 const { app, BrowserWindow, Tray, Menu, MenuItem } = require('electron');
 const electronShell = require('electron').shell;
 const process = require('process');
@@ -15,6 +23,7 @@ let winMain, tray;
     Declare > CLI State
 
     bWinHidden      --hidden    app closes to tray on start
+    bDevTools       --dev       dev tools added to menu
     bQuitOnClose    --quit      when pressing top-right close button, app exits instead of going to tray
 */
 
@@ -62,7 +71,7 @@ console.log(process.argv);
 
     Entries for the top interface menu
 
-    App | Configure | Help
+    App | Configure
 */
 
 const menu_Main = [
@@ -170,16 +179,11 @@ function activeDevTools() {
     }
 }
 
-
 /*
     App > Ready
 */
 
 function ready() {
-
-    /*
-        New Window
-    */
 
     winMain = new BrowserWindow({
         title: 'Test App',
@@ -188,18 +192,7 @@ function ready() {
         backgroundColor: '#212121'
     });
 
-    /*
-        Load default url to main window
-
-        since the user has settings they can modify; add check instanceUrl to ensure it is a valid string.
-        otherwise app will return invalid index and stop loading.
-    */
-
     winMain.loadURL('https://google.com/')
-
-    /*
-        Event > Page Title Update
-    */
 
     winMain.on('page-title-updated', (e) => {
         e.preventDefault();
@@ -207,9 +200,6 @@ function ready() {
 
     /*
         Event > Close
-
-        if --quit cli argument specified, app will completely quit when close pressed.
-        otherwise; app will hide
     */
 
     winMain.on('close', function (e) {
@@ -226,23 +216,8 @@ function ready() {
         return false;
     });
 
-    /*
-        Event > Closed
-    */
-
     winMain.on('closed', () => {
         winMain = null;
-    });
-
-    /*
-        Event > New Window
-
-        buttons leading to external websites should open in user browser
-    */
-
-    winMain.webContents.on('new-window', (e, url) => {
-        e.preventDefault();
-        require('electron').shell.openExternal(url);
     });
 
     /*
@@ -285,14 +260,6 @@ function ready() {
         }
     });
 
-    /*
-        Loop args
-
-        --hidden        : automatically hide window
-        --dev           : enable developer tools
-        --quit          : quit app when close button pressed
-    */
-
     for (let i = 0; i < process.argv.length; i++) {
         if (process.argv[i] === '--hidden') {
             bWinHidden = 1;
@@ -304,9 +271,5 @@ function ready() {
     }
 
 }
-
-/*
-    App > Ready
-*/
 
 app.on('ready', ready);
