@@ -1,0 +1,32 @@
+{
+    "name": "electron-prompts",
+    "version": "1.0.0",
+    "description": "Test app for custom dialog prompts",
+    "homepage": "https://github.com/Aetherinox/electron-prompts",
+    "author": "Aetherinox",
+    "publishConfig": {
+        "access": "public"
+    },
+    "build": {
+        "appId": "com.electron-prompts.id"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Aetherinox/electron-prompts.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Aetherinox/electron-prompts/issues"
+    },
+    "license": "GPLv3",
+    "keywords": [
+        "test"
+    ],
+    "main": "index.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "dependencies": {
+        "custom-electron-prompt": "^1.5.7",
+        "electron": "^31.0.0"
+    }
+}

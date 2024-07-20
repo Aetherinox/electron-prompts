@@ -1,1 +1,2 @@
-# electron-prompts
+# About
+Electron Test App for custom dialogs
